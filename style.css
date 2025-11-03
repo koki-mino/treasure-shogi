@@ -1,0 +1,17 @@
+/* 追加のちょい調整（Tailwindで届かない細かいところ） */
+.cell-disabled {
+  opacity: 0.25;
+}
+.cell-reachable {
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.7) inset; /* amber-ish */
+  animation: ping 1s infinite;
+}
+@keyframes ping {
+  0%   { box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.7) inset; }
+  50%  { box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2) inset; }
+  100% { box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.7) inset; }
+}
+.popup-bg {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+}

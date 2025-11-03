@@ -14,16 +14,20 @@ const STAGES = [
   { name: "4-ふーくん", piece: "pawn",  start: [4, 2], goal: [0, 2], blocks: [[1,1],[2,3],[3,1]],     moves: 4 },
 
   // 桂（2マス前ジャンプ）
-  { name: "5-けーくん", piece: "knight",start: [4, 2], goal: [0, 2], blocks: [[2,1],[2,3]],           moves: 6 },
+  { name: "5-けーくん", piece: "knight",start: [4, 2], goal: [0, 2], blocks: [[1,1],[1,3],[3,3],[3,2]],  moves: 3 },
 
   // 香（前にまっすぐ何マスでも）
-  { name: "6-きょーくん", piece: "lance", start: [4, 2], goal: [0, 2], blocks: [[2,2]],                 moves: 4 },
+  { name: "6-きょーくん", piece: "lance", start: [4, 2], goal: [0, 2], blocks: [[2,1]],                 moves: 4 },
 
   // 飛（上下左右に何マスでも）
   { name: "7-ひしゃくん", piece: "rook",  start: [4, 2], goal: [0, 2], blocks: [[3,2],[2,2]],           moves: 5 },
 
   // 角（斜めに何マスでも）
   { name: "8-かくさん", piece: "bishop",start: [4, 2], goal: [0, 2], blocks: [[3,3],[2,2],[3,1]],     moves: 6 },
+
+  // 玉
+  { name: "9-玉",  piece: "king", start: [4, 2], goal: [0, 2], blocks: [[2,2]],                 moves: 5 },
+　{ name: "10-玉", piece: "king", start: [4, 4], goal: [0, 0], blocks: [[3,3],[2,2],[1,1],[3,1]], moves: 6 },
 ];
 
 // 駒ごとの表示名と画像キー
@@ -35,6 +39,7 @@ const PIECES = {
   lance:  { label: "香", assetKey: "kyokun"   },
   rook:   { label: "飛", assetKey: "hishakun" },
   bishop: { label: "角", assetKey: "kakusan"  },
+  king:   { label: "玉", assetKey: "ousama" },
 };
 
 // 画像アセット（未用意は当面きんちゃん画像で代用OK）
@@ -49,6 +54,7 @@ const ASSETS = {
   kyokun:    "./img/kinchan.png",
   hishakun:  "./img/kinchan.png",
   kakusan:   "./img/kinchan.png",
+  ousama:    "./img/kinchan.png",
 };
 
 function preloadImages(paths) {
@@ -211,7 +217,18 @@ function calcReachables() {
     if (canPut(nr,nc)) reachableCells.push([nr,nc]);
     return;
   }
-
+if (piece === "king") {
+    const deltas = [
+      [-1,0],[1,0],[0,-1],[0,1], // 上下左右
+      [-1,-1],[-1,1],[1,-1],[1,1] // 斜め
+    ];
+    for (const [dr,dc] of deltas) {
+      const nr = r+dr, nc = c+dc;
+      if (canPut(nr,nc)) reachableCells.push([nr,nc]);
+    }
+    return;
+  }
+  
   // ジャンプ（桂）
   if (piece === "knight") {
     const jumps = [[-2,-1],[-2,1]];

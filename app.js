@@ -1,27 +1,30 @@
 // ====== ゲーム設定 ======
 const BOARD_SIZE = 5;
 
-// ステージ定義
-// - start: きんちゃんの開始位置 [row, col]
-// - goal: 宝箱の位置 [row, col]
-// - blocks: 岩などで入れないマス
-// - moves: 制限手数
+// ステージ定義（piece に使う駒を指定）
 const STAGES = [
-  {
-    name: "1",
-    start: [4, 2],
-    goal:  [0, 2],
-    blocks: [],
-    moves: 5
-  },
-  {
-    name: "2",
-    start: [4, 4],
-    goal:  [0, 0],
-    blocks: [[2,2],[2,3],[1,3]],
-    moves: 7
-  }
-]; 
+  // 金（既存）
+  { name: "1-金", piece: "gold",  start: [4, 2], goal: [0, 2], blocks: [],                     moves: 5 },
+  { name: "2-金", piece: "gold",  start: [4, 4], goal: [0, 0], blocks: [[2,2],[2,3],[1,3]],     moves: 7 },
+
+  // 銀
+  { name: "3-銀", piece: "silver",start: [4, 2], goal: [0, 2], blocks: [[2,1],[2,2],[2,3]],     moves: 6 },
+
+  // 歩
+  { name: "4-歩", piece: "pawn",  start: [4, 2], goal: [0, 2], blocks: [[1,2],[2,2],[3,2]],     moves: 6 },
+
+  // 桂（※将棋と同じ２マス前ジャンプ。盤外に出やすいので配置は中央寄り推奨）
+  { name: "5-桂", piece: "knight",start: [4, 2], goal: [0, 2], blocks: [[2,1],[2,3]],           moves: 6 },
+
+  // 香（前方向にまっすぐ何マスでも。岩で止まる）
+  { name: "6-香", piece: "lance", start: [4, 2], goal: [0, 2], blocks: [[2,2]],                 moves: 4 },
+
+  // 飛（上下左右に何マスでも）
+  { name: "7-飛", piece: "rook",  start: [4, 2], goal: [0, 2], blocks: [[3,2],[2,2]],           moves: 5 },
+
+  // 角（斜めに何マスでも）
+  { name: "8-角", piece: "bishop",start: [4, 2], goal: [0, 2], blocks: [[3,3],[2,2],[3,1]],     moves: 6 },
+];
 
 // 画像アセット & プリロード
 const ASSETS = {

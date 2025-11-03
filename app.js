@@ -120,30 +120,39 @@ function drawBoard() {
       }
 
       if (isPlayer) {
-        cell.innerHTML = `
-          <div class="flex flex-col items-center leading-none">
-            <div class="w-8 h-8 rounded-xl bg-amber-300 shadow flex items-center justify-center text-[11px] font-bold text-gray-800 ring-1 ring-amber-500">
-              金
-            </div>
-            <div class="text-[9px] text-gray-700 font-normal mt-0.5">きんちゃん</div>
-          </div>
-        `;
-      } else if (isGoal) {
-        cell.innerHTML = `
-          <div class="flex flex-col items-center leading-none">
-            <div class="w-8 h-8 rounded-xl bg-yellow-200 shadow flex items-center justify-center text-[11px] font-bold text-yellow-700 ring-1 ring-yellow-500">
-              宝
-            </div>
-            <div class="text-[9px] text-yellow-700 font-normal mt-0.5">おたから</div>
-          </div>
-        `;
-      } else if (isBlock) {
-        cell.innerHTML = `
-          <div class="flex flex-col items-center leading-none opacity-70">
-            <div class="w-8 h-8 rounded-xl bg-gray-400 shadow-inner flex items-center justify-center text-[11px] font-bold text-white ring-1 ring-gray-500">
-              岩
-            </div>
-            <div class="text-[9px] text-gray-600 font-normal mt-0.5">とおれない</div>
+  cell.innerHTML = `
+    <figure class="flex flex-col items-center leading-none">
+      <img src="${ASSETS.kinchan}" alt="きんちゃん"
+           width="64" height="64"
+           class="w-12 h-12 object-contain drop-shadow"
+           loading="eager" decoding="async" draggable="false">
+      <figcaption class="text-[9px] text-gray-700 font-normal mt-0.5">きんちゃん</figcaption>
+    </figure>
+  `;
+} else if (isGoal) {
+  cell.innerHTML = `
+    <figure class="flex flex-col items-center leading-none">
+      <img src="${ASSETS.treasure}" alt="おたから"
+           width="64" height="64"
+           class="w-12 h-12 object-contain"
+           loading="eager" decoding="async" draggable="false">
+      <figcaption class="text-[9px] text-yellow-700 font-normal mt-0.5">おたから</figcaption>
+    </figure>
+  `;
+} else if (isBlock) {
+  cell.innerHTML = `
+    <figure class="flex flex-col items-center leading-none opacity-80">
+      <img src="${ASSETS.rock}" alt="とおれない岩"
+           width="64" height="64"
+           class="w-12 h-12 object-contain"
+           loading="eager" decoding="async" draggable="false">
+      <figcaption class="text-[9px] text-gray-600 font-normal mt-0.5">とおれない</figcaption>
+    </figure>
+  `;
+} else {
+  cell.innerHTML = `<div class="text-[9px] text-gray-400 font-normal leading-none">${r},${c}</div>`;
+}   
+          <div class="text-[9px] text-gray-600 font-normal mt-0.5">とおれない</div>
           </div>
         `;
       } else {

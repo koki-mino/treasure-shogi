@@ -13,10 +13,10 @@ const STAGES = [
   // 歩
   { name: "4-歩", piece: "pawn",  start: [4, 2], goal: [0, 2], blocks: [[1,2],[2,2],[3,2]],     moves: 6 },
 
-  // 桂（※将棋と同じ２マス前ジャンプ。盤外に出やすいので配置は中央寄り推奨）
+  // 桂（2マス前ジャンプ）
   { name: "5-桂", piece: "knight",start: [4, 2], goal: [0, 2], blocks: [[2,1],[2,3]],           moves: 6 },
 
-  // 香（前方向にまっすぐ何マスでも。岩で止まる）
+  // 香（前にまっすぐ何マスでも）
   { name: "6-香", piece: "lance", start: [4, 2], goal: [0, 2], blocks: [[2,2]],                 moves: 4 },
 
   // 飛（上下左右に何マスでも）
@@ -37,11 +37,12 @@ const PIECES = {
   bishop: { label: "角", assetKey: "kakusan"  },
 };
 
-// 画像アセット & プリロード
+// 画像アセット（未用意は当面きんちゃん画像で代用OK）
 const ASSETS = {
-  kinchan:  "./img/kinchan.png",
-  treasure: "./img/treasure.png",
-  rock:     "./img/rock.png",
+  kinchan:   "./img/kinchan.png",
+  treasure:  "./img/treasure.png",
+  rock:      "./img/rock.png",
+
   ginchan:   "./img/kinchan.png",
   fukun:     "./img/kinchan.png",
   keichan:   "./img/kinchan.png",
@@ -55,7 +56,7 @@ function preloadImages(paths) {
     paths.map(src => new Promise(res => {
       const img = new Image();
       img.onload = res;
-      img.onerror = res;
+      img.onerror = res; // 失敗しても先に進む
       img.src = src;
     }))
   );
@@ -90,6 +91,8 @@ function loadStage(index) {
   // UI反映
   movesLeftEl.textContent = movesLeft;
   stageNameEl.textContent = stage.name;
+  const pieceEl = document.getElementById("pieceName");
+  if (pieceEl) pieceEl.textContent = (PIECES[stage.piece]?.label ?? "金");
 
   drawBoard();
   calcReachables();
@@ -110,56 +113,37 @@ function drawBoard() {
       const isPlayer = (playerPos[0] === r && playerPos[1] === c);
       const isGoal   = (goalPos[0] === r && goalPos[1] === c);
       const isBlock  = blocks.includes([r,c].join(","));
-
       const canMoveHere = reachableCells.some(rc => rc[0] === r && rc[1] === c);
 
       const cell = document.createElement("button");
       cell.setAttribute("data-r", r);
       cell.setAttribute("data-c", c);
 
+      // 見た目のベース
       let classList =
         "relative aspect-square w-full rounded-2xl flex items-center justify-center " +
         "ring-1 ring-gray-300 bg-gradient-to-br from-white to-gray-50 " +
         "text-[10px] font-semibold text-gray-700 shadow-inner active:scale-95 transition";
 
-      if (isGoal) {
-        classList += " bg-yellow-100 ring-yellow-400 text-yellow-700";
-      }
-      if (isBlock) {
-        classList += " bg-gray-300 ring-gray-400 text-gray-600 cell-disabled";
-      }
+      if (isGoal)  classList += " bg-yellow-100 ring-yellow-400 text-yellow-700";
+      if (isBlock) classList += " bg-gray-300 ring-gray-400 text-gray-600 cell-disabled";
+      if (isPlayer) classList += " bg-amber-200 ring-amber-400 shadow-lg text-gray-900";
+      if (!isPlayer && !isBlock && canMoveHere) classList += " cell-reachable";
+
+      // プレイヤー表示（ステージの駒で切り替え）
       if (isPlayer) {
-        // ... drawBoard() の中、isPlayer の描画分岐を置き換え
-if (isPlayer) {
-  const stage = STAGES[currentStageIndex];
-  const pieceInfo = PIECES[stage.piece] || PIECES.gold;
-  const assetKey  = pieceInfo.assetKey;
-  const imgSrc    = ASSETS[assetKey] || ASSETS.kinchan;
-  const label     = pieceInfo.label;
+        const pieceInfo = PIECES[stage.piece] || PIECES.gold;
+        const assetKey  = pieceInfo.assetKey;
+        const imgSrc    = ASSETS[assetKey] || ASSETS.kinchan;
+        const label     = pieceInfo.label;
 
-  cell.innerHTML = `
-    <figure class="flex flex-col items-center leading-none">
-      <img src="${imgSrc}" alt="${label}"
-           width="64" height="64"
-           class="w-12 h-12 object-contain drop-shadow img-pop"
-           loading="eager" decoding="async" draggable="false">
-      <figcaption class="text-[9px] text-gray-700 font-normal mt-0.5">${label}ちゃん</figcaption>
-    </figure>
-  `;
-}
-
-      if (!isPlayer && !isBlock && canMoveHere) {
-        classList += " cell-reachable";
-      }
-
-      if (isPlayer) {
         cell.innerHTML = `
           <figure class="flex flex-col items-center leading-none">
-            <img src="${ASSETS.kinchan}" alt="きんちゃん"
+            <img src="${imgSrc}" alt="${label}"
                  width="64" height="64"
-                 class="w-12 h-12 object-contain drop-shadow"
+                 class="w-12 h-12 object-contain drop-shadow img-pop"
                  loading="eager" decoding="async" draggable="false">
-            <figcaption class="text-[9px] text-gray-700 font-normal mt-0.5">きんちゃん</figcaption>
+            <figcaption class="text-[9px] text-gray-700 font-normal mt-0.5">${label}ちゃん</figcaption>
           </figure>
         `;
       } else if (isGoal) {
@@ -198,66 +182,61 @@ if (isPlayer) {
   }
 }
 
-// ====== きんちゃんの動ける方向（“金”のイメージ） ======
+// ====== 駒ごとの到達可能マス ======
 function calcReachables() {
   const stage  = STAGES[currentStageIndex];
-  const piece  = stage.piece;                 // ← 駒の種類
+  const piece  = stage.piece;
   const blocks = new Set(stage.blocks.map(p => p.join(",")));
 
   reachableCells = [];
 
-  // 盤内 & ブロックでない を共通チェック
   const canPut = (r,c) =>
     r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && !blocks.has([r,c].join(","));
 
   const r = playerPos[0], c = playerPos[1];
 
-  // 1) 1マス系（金・銀・歩）
+  // 1マス系（金・銀・歩）
   if (piece === "gold") {
-    const deltas = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1]]; // 金：前・後・左右・斜め前
+    const deltas = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1]];
     for (const [dr,dc] of deltas) { const nr=r+dr, nc=c+dc; if (canPut(nr,nc)) reachableCells.push([nr,nc]); }
     return;
   }
   if (piece === "silver") {
-    const deltas = [[-1,0],[-1,-1],[-1,1],[1,-1],[1,1]]; // 銀：前・斜め前・斜め後
+    const deltas = [[-1,0],[-1,-1],[-1,1],[1,-1],[1,1]];
     for (const [dr,dc] of deltas) { const nr=r+dr, nc=c+dc; if (canPut(nr,nc)) reachableCells.push([nr,nc]); }
     return;
   }
   if (piece === "pawn") {
-    const nr = r-1, nc = c;                     // 歩：前に1
+    const nr = r-1, nc = c;
     if (canPut(nr,nc)) reachableCells.push([nr,nc]);
     return;
   }
 
-  // 2) ジャンプ系（桂）
+  // ジャンプ（桂）
   if (piece === "knight") {
-    // 桂：前前左／前前右（先手前提で上方向）
     const jumps = [[-2,-1],[-2,1]];
     for (const [dr,dc] of jumps) { const nr=r+dr, nc=c+dc; if (canPut(nr,nc)) reachableCells.push([nr,nc]); }
     return;
   }
 
-  // 3) 直線スライド系（香・飛・角）
+  // 直線スライド（香・飛・角）
   const pushRay = (dr,dc) => {
     let nr = r+dr, nc = c+dc;
     while (canPut(nr,nc)) {
       reachableCells.push([nr,nc]);
-      // 次マスへ（ブロックは手前で止まる）
       nr += dr; nc += dc;
     }
   };
 
-  if (piece === "lance") {        // 香：前方向にまっすぐ
+  if (piece === "lance") { // 香：前方向
     pushRay(-1,0);
     return;
   }
-
-  if (piece === "rook") {         // 飛：上下左右
+  if (piece === "rook") {  // 飛：上下左右
     pushRay(-1,0); pushRay(1,0); pushRay(0,-1); pushRay(0,1);
     return;
   }
-
-  if (piece === "bishop") {       // 角：斜め
+  if (piece === "bishop") { // 角：斜め
     pushRay(-1,-1); pushRay(-1,1); pushRay(1,-1); pushRay(1,1);
     return;
   }

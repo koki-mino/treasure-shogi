@@ -4,26 +4,26 @@ const BOARD_SIZE = 5;
 // ステージ定義（piece に使う駒を指定）
 const STAGES = [
   // 金（既存）
-  { name: "1-金", piece: "gold",  start: [4, 2], goal: [0, 2], blocks: [],                     moves: 5 },
-  { name: "2-金", piece: "gold",  start: [4, 4], goal: [0, 0], blocks: [[2,2],[2,3],[1,3]],     moves: 7 },
+  { name: "1-きんちゃん", piece: "gold",  start: [4, 2], goal: [0, 2], blocks: [],                     moves: 5 },
+  { name: "2-きんちゃん", piece: "gold",  start: [4, 4], goal: [0, 0], blocks: [[2,2],[2,3],[1,3]],     moves: 7 },
 
   // 銀
-  { name: "3-銀", piece: "silver",start: [4, 2], goal: [0, 2], blocks: [[2,1],[2,2],[2,3]],     moves: 6 },
+  { name: "3-ぎんちゃん", piece: "silver",start: [4, 2], goal: [0, 2], blocks: [[2,1],[2,2],[2,3]],     moves: 6 },
 
   // 歩
-  { name: "4-歩", piece: "pawn",  start: [4, 2], goal: [0, 2], blocks: [[1,2],[2,2],[3,2]],     moves: 6 },
+  { name: "4-ふーくん", piece: "pawn",  start: [4, 2], goal: [0, 2], blocks: [[1,1],[2,3],[3,1]],     moves: 4 },
 
   // 桂（2マス前ジャンプ）
-  { name: "5-桂", piece: "knight",start: [4, 2], goal: [0, 2], blocks: [[2,1],[2,3]],           moves: 6 },
+  { name: "5-けーくん", piece: "knight",start: [4, 2], goal: [0, 2], blocks: [[2,1],[2,3]],           moves: 6 },
 
   // 香（前にまっすぐ何マスでも）
-  { name: "6-香", piece: "lance", start: [4, 2], goal: [0, 2], blocks: [[2,2]],                 moves: 4 },
+  { name: "6-きょーくん", piece: "lance", start: [4, 2], goal: [0, 2], blocks: [[2,2]],                 moves: 4 },
 
   // 飛（上下左右に何マスでも）
-  { name: "7-飛", piece: "rook",  start: [4, 2], goal: [0, 2], blocks: [[3,2],[2,2]],           moves: 5 },
+  { name: "7-ひしゃくん", piece: "rook",  start: [4, 2], goal: [0, 2], blocks: [[3,2],[2,2]],           moves: 5 },
 
   // 角（斜めに何マスでも）
-  { name: "8-角", piece: "bishop",start: [4, 2], goal: [0, 2], blocks: [[3,3],[2,2],[3,1]],     moves: 6 },
+  { name: "8-かくさん", piece: "bishop",start: [4, 2], goal: [0, 2], blocks: [[3,3],[2,2],[3,1]],     moves: 6 },
 ];
 
 // 駒ごとの表示名と画像キー

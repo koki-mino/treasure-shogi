@@ -5,8 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>きんちゃんのたからさがし - MVP</title>
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS（開発用CDN。警告は開発中ならOK） -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 画像のプリロード（初回表示を安定させる） -->
+  <link rel="preload" as="image" href="./img/kinchan.png">
+  <link rel="preload" as="image" href="./img/treasure.png">
+  <link rel="preload" as="image" href="./img/rock.png">
 
   <!-- カスタムCSS -->
   <link rel="stylesheet" href="./style.css">
@@ -32,10 +37,17 @@
       <span class="text-[10px] text-gray-500">のこりて</span>
       <span id="movesLeft" class="text-lg font-bold text-rose-500 drop-shadow">--</span>
     </div>
+
     <div class="flex flex-col items-center">
       <span class="text-[10px] text-gray-500">いまのステージ</span>
       <span id="stageName" class="text-xs font-semibold">1</span>
     </div>
+
+    <div class="flex flex-col items-center">
+      <span class="text-[10px] text-gray-500">いまの こま</span>
+      <span id="pieceName" class="text-xs font-semibold">金</span>
+    </div>
+
     <button id="restartBtn"
       class="text-[11px] px-3 py-1 rounded-xl bg-white shadow ring-1 ring-gray-200 active:scale-95 transition">
       さいしょから
@@ -49,7 +61,7 @@
     </div>
   </main>
 
-  <!-- 説明 -->
+  <!-- 説明（任意） -->
   <section class="w-full max-w-sm text-[11px] leading-relaxed text-gray-600 mt-4">
     <p class="mb-2 font-semibold text-gray-700 flex items-center gap-1">
       <span class="w-4 h-4 rounded bg-amber-300 flex items-center justify-center text-[10px] font-bold text-gray-800 shadow-inner">金</span>
@@ -60,7 +72,8 @@
     <p class="mb-2">※ ななめうしろには いけないよ</p>
 
     <p class="font-semibold text-rose-500">
-      おたから<span class="inline-block align-middle w-4 h-4 ml-1 mr-1 rounded-lg bg-yellow-200 ring-1 ring-yellow-400 text-[10px] font-bold text-yellow-700 flex items-center justify-center shadow-inner">宝</span>
+      おたから
+      <span class="inline-block align-middle w-4 h-4 ml-1 mr-1 rounded-lg bg-yellow-200 ring-1 ring-yellow-400 text-[10px] font-bold text-yellow-700 flex items-center justify-center shadow-inner">宝</span>
       に たどりつけば クリア！
     </p>
   </section>
@@ -79,7 +92,11 @@
     </div>
   </div>
 
-  <!-- ゲームロジック -->
-  <script src="./app.js"></script>
+  <!-- （任意）簡易デバッグ欄：必要なときだけコメント解除
+  <pre id="debug" style="position:fixed;left:8px;bottom:8px;right:8px;max-height:40vh;overflow:auto;font:12px/1.4 ui-monospace,monospace;background:#0008;color:#fff;padding:8px;border-radius:8px"></pre>
+  -->
+
+  <!-- ゲームロジック（defer 必須） -->
+  <script src="./app.js" defer></script>
 </body>
 </html>

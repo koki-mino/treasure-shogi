@@ -21,7 +21,9 @@ const STAGES = [
     blocks: [[2,2],[2,3],[1,3]],
     moves: 7
   }
-  // 以降、追加しやすい
+]; // ← ここでちゃんと閉じる
+
+// 画像アセット & プリロード
 const ASSETS = {
   kinchan:  "./img/kinchan.png",
   treasure: "./img/treasure.png",
@@ -29,21 +31,15 @@ const ASSETS = {
 };
 
 function preloadImages(paths) {
-  return Promise.all(paths.map(src => new Promise(res => {
-    const img = new Image();
-    img.onload = res;
-    img.onerror = res;
-    img.src = src;
-  })));
+  return Promise.all(
+    paths.map(src => new Promise(res => {
+      const img = new Image();
+      img.onload = res;
+      img.onerror = res;
+      img.src = src;
+    }))
+  );
 }
-
-// 起動時：画像を読んでからステージ開始
-(async () => {
-  await preloadImages(Object.values(ASSETS));
-  loadStage(0);
-})();
-
-];
 
 // ====== 状態 ======
 let currentStageIndex = 0;
@@ -120,40 +116,34 @@ function drawBoard() {
       }
 
       if (isPlayer) {
-  cell.innerHTML = `
-    <figure class="flex flex-col items-center leading-none">
-      <img src="${ASSETS.kinchan}" alt="きんちゃん"
-           width="64" height="64"
-           class="w-12 h-12 object-contain drop-shadow"
-           loading="eager" decoding="async" draggable="false">
-      <figcaption class="text-[9px] text-gray-700 font-normal mt-0.5">きんちゃん</figcaption>
-    </figure>
-  `;
-} else if (isGoal) {
-  cell.innerHTML = `
-    <figure class="flex flex-col items-center leading-none">
-      <img src="${ASSETS.treasure}" alt="おたから"
-           width="64" height="64"
-           class="w-12 h-12 object-contain"
-           loading="eager" decoding="async" draggable="false">
-      <figcaption class="text-[9px] text-yellow-700 font-normal mt-0.5">おたから</figcaption>
-    </figure>
-  `;
-} else if (isBlock) {
-  cell.innerHTML = `
-    <figure class="flex flex-col items-center leading-none opacity-80">
-      <img src="${ASSETS.rock}" alt="とおれない岩"
-           width="64" height="64"
-           class="w-12 h-12 object-contain"
-           loading="eager" decoding="async" draggable="false">
-      <figcaption class="text-[9px] text-gray-600 font-normal mt-0.5">とおれない</figcaption>
-    </figure>
-  `;
-} else {
-  cell.innerHTML = `<div class="text-[9px] text-gray-400 font-normal leading-none">${r},${c}</div>`;
-}   
-          <div class="text-[9px] text-gray-600 font-normal mt-0.5">とおれない</div>
-          </div>
+        cell.innerHTML = `
+          <figure class="flex flex-col items-center leading-none">
+            <img src="${ASSETS.kinchan}" alt="きんちゃん"
+                 width="64" height="64"
+                 class="w-12 h-12 object-contain drop-shadow"
+                 loading="eager" decoding="async" draggable="false">
+            <figcaption class="text-[9px] text-gray-700 font-normal mt-0.5">きんちゃん</figcaption>
+          </figure>
+        `;
+      } else if (isGoal) {
+        cell.innerHTML = `
+          <figure class="flex flex-col items-center leading-none">
+            <img src="${ASSETS.treasure}" alt="おたから"
+                 width="64" height="64"
+                 class="w-12 h-12 object-contain"
+                 loading="eager" decoding="async" draggable="false">
+            <figcaption class="text-[9px] text-yellow-700 font-normal mt-0.5">おたから</figcaption>
+          </figure>
+        `;
+      } else if (isBlock) {
+        cell.innerHTML = `
+          <figure class="flex flex-col items-center leading-none opacity-80">
+            <img src="${ASSETS.rock}" alt="とおれない岩"
+                 width="64" height="64"
+                 class="w-12 h-12 object-contain"
+                 loading="eager" decoding="async" draggable="false">
+            <figcaption class="text-[9px] text-gray-600 font-normal mt-0.5">とおれない</figcaption>
+          </figure>
         `;
       } else {
         cell.innerHTML = `<div class="text-[9px] text-gray-400 font-normal leading-none">${r},${c}</div>`;
@@ -260,5 +250,8 @@ function restartGame() {
 restartBtn.addEventListener("click", restartGame);
 popupCloseBtn.addEventListener("click", closePopupAndNext);
 
-// ====== 起動 ======
-loadStage(0);
+// ====== 起動（画像を読んでから開始） ======
+(async () => {
+  await preloadImages(Object.values(ASSETS));
+  loadStage(0);
+})();

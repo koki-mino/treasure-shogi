@@ -20,10 +20,10 @@ const STAGES = [
   { name: "6-きょーくん", piece: "lance", start: [4, 2], goal: [0, 2], blocks: [[2,1]],                 moves: 4 },
 
   // 飛（上下左右に何マスでも）
-  { name: "7-ひしゃくん", piece: "rook",  start: [4, 2], goal: [0, 2], blocks: [[3,2],[2,2]],           moves: 5 },
+  { name: "7-ひしゃくん", piece: "rook",  start: [4, 2], goal: [0, 2], blocks: [[3,2],[2,2]],           moves: 4 },
 
   // 角（斜めに何マスでも）
-  { name: "8-かくさん", piece: "bishop",start: [4, 2], goal: [0, 2], blocks: [[3,3],[2,2],[3,1]],     moves: 6 },
+  { name: "8-かくさん", piece: "bishop",start: [4, 2], goal: [0, 2], blocks: [[2,3],[2,2],[3,4]],     moves: 4 },
 
   // 玉
   { name: "9-玉",  piece: "king", start: [4, 2], goal: [0, 2], blocks: [[2,2]],                 moves: 5 },
@@ -32,14 +32,14 @@ const STAGES = [
 
 // 駒ごとの表示名と画像キー
 const PIECES = {
-  gold:   { label: "金", assetKey: "kinchan"  },
-  silver: { label: "銀", assetKey: "ginchan"  },
-  pawn:   { label: "歩", assetKey: "fukun"    },
-  knight: { label: "桂", assetKey: "keichan"  },
-  lance:  { label: "香", assetKey: "kyokun"   },
-  rook:   { label: "飛", assetKey: "hishakun" },
-  bishop: { label: "角", assetKey: "kakusan"  },
-  king:   { label: "玉", assetKey: "ousama" },
+  gold:   { label: "きんちゃん", assetKey: "kinchan"  },
+  silver: { label: "ぎんちゃん", assetKey: "ginchan"  },
+  pawn:   { label: "ふーくん", assetKey: "fukun"    },
+  knight: { label: "けーくん", assetKey: "keichan"  },
+  lance:  { label: "きょーくん", assetKey: "kyokun"   },
+  rook:   { label: "ひしゃくん", assetKey: "hishakun" },
+  bishop: { label: "かくさん", assetKey: "kakusan"  },
+  king:   { label: "おうさま", assetKey: "ousama" },
 };
 
 // 画像アセット（未用意は当面きんちゃん画像で代用OK）
@@ -149,7 +149,7 @@ function drawBoard() {
                  width="64" height="64"
                  class="w-12 h-12 object-contain drop-shadow img-pop"
                  loading="eager" decoding="async" draggable="false">
-            <figcaption class="text-[9px] text-gray-700 font-normal mt-0.5">${label}ちゃん</figcaption>
+            <figcaption class="text-[9px] text-gray-700 font-normal mt-0.5">${label}</figcaption>
           </figure>
         `;
       } else if (isGoal) {

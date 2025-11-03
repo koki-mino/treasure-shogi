@@ -26,11 +26,28 @@ const STAGES = [
   { name: "8-角", piece: "bishop",start: [4, 2], goal: [0, 2], blocks: [[3,3],[2,2],[3,1]],     moves: 6 },
 ];
 
+// 駒ごとの表示名と画像キー
+const PIECES = {
+  gold:   { label: "金", assetKey: "kinchan"  },
+  silver: { label: "銀", assetKey: "ginchan"  },
+  pawn:   { label: "歩", assetKey: "fukun"    },
+  knight: { label: "桂", assetKey: "keichan"  },
+  lance:  { label: "香", assetKey: "kyokun"   },
+  rook:   { label: "飛", assetKey: "hishakun" },
+  bishop: { label: "角", assetKey: "kakusan"  },
+};
+
 // 画像アセット & プリロード
 const ASSETS = {
   kinchan:  "./img/kinchan.png",
   treasure: "./img/treasure.png",
   rock:     "./img/rock.png",
+  ginchan:   "./img/kinchan.png",
+  fukun:     "./img/kinchan.png",
+  keichan:   "./img/kinchan.png",
+  kyokun:    "./img/kinchan.png",
+  hishakun:  "./img/kinchan.png",
+  kakusan:   "./img/kinchan.png",
 };
 
 function preloadImages(paths) {
@@ -112,8 +129,25 @@ function drawBoard() {
         classList += " bg-gray-300 ring-gray-400 text-gray-600 cell-disabled";
       }
       if (isPlayer) {
-        classList += " bg-amber-200 ring-amber-400 shadow-lg text-gray-900";
-      }
+        // ... drawBoard() の中、isPlayer の描画分岐を置き換え
+if (isPlayer) {
+  const stage = STAGES[currentStageIndex];
+  const pieceInfo = PIECES[stage.piece] || PIECES.gold;
+  const assetKey  = pieceInfo.assetKey;
+  const imgSrc    = ASSETS[assetKey] || ASSETS.kinchan;
+  const label     = pieceInfo.label;
+
+  cell.innerHTML = `
+    <figure class="flex flex-col items-center leading-none">
+      <img src="${imgSrc}" alt="${label}"
+           width="64" height="64"
+           class="w-12 h-12 object-contain drop-shadow img-pop"
+           loading="eager" decoding="async" draggable="false">
+      <figcaption class="text-[9px] text-gray-700 font-normal mt-0.5">${label}ちゃん</figcaption>
+    </figure>
+  `;
+}
+
       if (!isPlayer && !isBlock && canMoveHere) {
         classList += " cell-reachable";
       }
@@ -166,26 +200,66 @@ function drawBoard() {
 
 // ====== きんちゃんの動ける方向（“金”のイメージ） ======
 function calcReachables() {
-  const deltas = [
-    [-1,  0], // up
-    [ 1,  0], // down
-    [ 0, -1], // left
-    [ 0,  1], // right
-    [-1, -1], // up-left
-    [-1,  1], // up-right
-    // 斜め下は無し
-  ];
-  const stage = STAGES[currentStageIndex];
-  const blocks = stage.blocks.map(pair => pair.join(","));
+  const stage  = STAGES[currentStageIndex];
+  const piece  = stage.piece;                 // ← 駒の種類
+  const blocks = new Set(stage.blocks.map(p => p.join(",")));
 
   reachableCells = [];
 
-  for (const [dr,dc] of deltas) {
-    const nr = playerPos[0] + dr;
-    const nc = playerPos[1] + dc;
-    if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) continue;
-    if (blocks.includes([nr,nc].join(","))) continue;
-    reachableCells.push([nr,nc]);
+  // 盤内 & ブロックでない を共通チェック
+  const canPut = (r,c) =>
+    r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && !blocks.has([r,c].join(","));
+
+  const r = playerPos[0], c = playerPos[1];
+
+  // 1) 1マス系（金・銀・歩）
+  if (piece === "gold") {
+    const deltas = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1]]; // 金：前・後・左右・斜め前
+    for (const [dr,dc] of deltas) { const nr=r+dr, nc=c+dc; if (canPut(nr,nc)) reachableCells.push([nr,nc]); }
+    return;
+  }
+  if (piece === "silver") {
+    const deltas = [[-1,0],[-1,-1],[-1,1],[1,-1],[1,1]]; // 銀：前・斜め前・斜め後
+    for (const [dr,dc] of deltas) { const nr=r+dr, nc=c+dc; if (canPut(nr,nc)) reachableCells.push([nr,nc]); }
+    return;
+  }
+  if (piece === "pawn") {
+    const nr = r-1, nc = c;                     // 歩：前に1
+    if (canPut(nr,nc)) reachableCells.push([nr,nc]);
+    return;
+  }
+
+  // 2) ジャンプ系（桂）
+  if (piece === "knight") {
+    // 桂：前前左／前前右（先手前提で上方向）
+    const jumps = [[-2,-1],[-2,1]];
+    for (const [dr,dc] of jumps) { const nr=r+dr, nc=c+dc; if (canPut(nr,nc)) reachableCells.push([nr,nc]); }
+    return;
+  }
+
+  // 3) 直線スライド系（香・飛・角）
+  const pushRay = (dr,dc) => {
+    let nr = r+dr, nc = c+dc;
+    while (canPut(nr,nc)) {
+      reachableCells.push([nr,nc]);
+      // 次マスへ（ブロックは手前で止まる）
+      nr += dr; nc += dc;
+    }
+  };
+
+  if (piece === "lance") {        // 香：前方向にまっすぐ
+    pushRay(-1,0);
+    return;
+  }
+
+  if (piece === "rook") {         // 飛：上下左右
+    pushRay(-1,0); pushRay(1,0); pushRay(0,-1); pushRay(0,1);
+    return;
+  }
+
+  if (piece === "bishop") {       // 角：斜め
+    pushRay(-1,-1); pushRay(-1,1); pushRay(1,-1); pushRay(1,1);
+    return;
   }
 }
 

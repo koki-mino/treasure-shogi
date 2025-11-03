@@ -21,7 +21,7 @@ const STAGES = [
     blocks: [[2,2],[2,3],[1,3]],
     moves: 7
   }
-]; // ← ここでちゃんと閉じる
+]; 
 
 // 画像アセット & プリロード
 const ASSETS = {

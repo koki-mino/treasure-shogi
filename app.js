@@ -22,6 +22,27 @@ const STAGES = [
     moves: 7
   }
   // 以降、追加しやすい
+const ASSETS = {
+  kinchan:  "./img/kinchan.png",
+  treasure: "./img/treasure.png",
+  rock:     "./img/rock.png",
+};
+
+function preloadImages(paths) {
+  return Promise.all(paths.map(src => new Promise(res => {
+    const img = new Image();
+    img.onload = res;
+    img.onerror = res;
+    img.src = src;
+  })));
+}
+
+// 起動時：画像を読んでからステージ開始
+(async () => {
+  await preloadImages(Object.values(ASSETS));
+  loadStage(0);
+})();
+
 ];
 
 // ====== 状態 ======
